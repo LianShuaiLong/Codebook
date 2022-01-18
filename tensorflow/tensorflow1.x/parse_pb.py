@@ -6,6 +6,7 @@
 #       saved_model模式(包含pb和variables)
 #       纯pb模式(frozen pb):
 #       keras的h5格式
+# https://zhuanlan.zhihu.com/p/113734249⭐
 # 对pb(非freeze得到的pb)进行一系列操作:meta_graph,输入输出节点,weights,graph可视化
 import tensorflow.compat.v1 as tf
 #import tensorflow as tf
@@ -67,7 +68,7 @@ if __name__ =='__main__':
       parse_pb(model_file_path,dst_metagraph_name,dst_weights_name,dst_nodes_name)
 
 
-      # for fronzen protobuf TF model.
+      # for fronzen protobuf TF model.pb model not model dir
       # def load_graph(trained_model):   
       #   with tf.gfile.GFile(trained_model, "rb") as f:
       #       graph_def = tf.GraphDef()
@@ -82,7 +83,7 @@ if __name__ =='__main__':
       #           )
       #   return graph
 
-      # for TF model using API SavedModelBuilder
+      # for TF model using API SavedModelBuilder, model_dir 
       # export_dir = "./tf_resnet152"
       # with tf.Session(graph=tf.Graph()) as sess:
       #     tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.TRAINING], export_dir)
