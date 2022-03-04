@@ -110,18 +110,55 @@ class Solution:
                     #这个判断保证了次对角线元素的取值
                     if j-i<=2:
                         matrix[i][j]= True
+                    else:
+                        matrix[i][j]=matrix[i+1][j-1]
+                    if matrix[i][j]:
                         if j-i+1>max_len:
                             max_len = j-i+1
                             max_s = s[i:(j+1)]
-                    else:
-                        matrix[i][j]=matrix[i+1][j-1]
-                        if matrix[i][j]:
-                            if j-i+1>max_len:
-                                max_len = j-i+1
-                                max_s = s[i:(j+1)]
                 else:
                     matrix[i][j] =False
         return max_s
+        # 思路三：中心点扩散
+        # m = len(s)
+        # if m==1:
+        #     return s
+        # if m==2:
+        #     if s[0]==s[1]:
+        #         return s
+        #     else:
+        #         return s[0]
+        # max_len=1
+        # str_max_len = s[0]
+        # for i in range(1,len(s)):
+        #     left,right = i-1,i+1
+        #     cur_len = 1
+        #     #判断直接以当前一点向两边扩还是以当前两点向两边扩
+        #     if left>=0 and right<len(s):
+        #         if s[i]==s[left] and s[i]!=s[right]:
+        #             cur_len = 2
+        #             left = i-2
+        #             if cur_len>max_len:
+        #                 max_len = cur_len
+        #                 str_max_len = s[(i-1):(i+1)]
+        #         elif s[i]!=s[left] and s[i]==s[right]:
+        #             cur_len = 2
+        #             right = i+2
+        #             if cur_len>max_len:
+        #                 max_len = cur_len
+        #                 str_max_len = s[i:(i+2)]
+        
+        #     while left>=0 and right<len(s):
+        #         if s[left]==s[right]:
+        #             cur_len+=2
+        #             if cur_len>max_len:
+        #                 max_len = cur_len
+        #                 str_max_len = s[left:(right+1)]
+        #             left-=1
+        #             right+=1
+        #         else:
+        #             break
+        # return str_max_len  
 
 
         
