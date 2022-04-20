@@ -1,0 +1,69 @@
+不要使用太大的线性层。因为nn.Linear(m,n)使用的是的内存，线性层太大很容易超出现有显存。
+
+
+不要在太长的序列上使用RNN。因为RNN反向传播使用的是BPTT算法，其需要的内存和输入序列的长度呈线性关系。
+
+
+model(x) 前用 model.train() 和 model.eval() 切换网络状态。
+
+
+不需要计算梯度的代码块用 with torch.no_grad() 包含起来。
+model.eval() 和 torch.no_grad() 的区别在于，model.eval() 是将网络切换为测试状态，例如 BN 和dropout在训练和测试阶段使用不同的计算方法。
+torch.no_grad() 是关闭 PyTorch 张量的自动求导机制，以减少存储使用和加速计算，得到的结果无法进行 loss.backward()。
+
+
+model.zero_grad()会把整个模型的参数的梯度都归零, 而optimizer.zero_grad()只会把传入其中的参数的梯度归零.
+
+
+torch.nn.CrossEntropyLoss 的输入不需要经过 Softmax。torch.nn.CrossEntropyLoss 等价于 torch.nn.functional.log_softmax + torch.nn.NLLLoss。
+
+
+loss.backward() 前用 optimizer.zero_grad() 清除累积梯度。
+
+
+torch.utils.data.DataLoader 中尽量设置 pin_memory=True，对特别小的数据集如 MNIST 设置 pin_memory=False 反而更快一些。
+num_workers 的设置需要在实验中找到最快的取值。
+
+
+用 del 及时删除不用的中间变量，节约 GPU 存储。
+使用 inplace 操作可节约 GPU 存储，如
+x = torch.nn.functional.relu(x, inplace=True)
+
+
+减少 CPU 和 GPU 之间的数据传输。
+例如如果你想知道一个 epoch 中每个 mini-batch 的 loss 和准确率，先将它们累积在 GPU 中等一个 epoch 结束之后一起传输回 CPU 会比每个 mini-batch 都进行一次 GPU 到 CPU 的传输更快。
+
+
+使用半精度浮点数 half() 会有一定的速度提升，具体效率依赖于 GPU 型号。需要小心数值精度过低带来的稳定性问题。
+
+
+时常使用 assert tensor.size() == (N, D, H, W) 作为调试手段，确保张量维度和你设想中一致。
+
+
+除了标记 y 外，尽量少使用一维张量，使用 n*1 的二维张量代替，可以避免一些意想不到的一维张量计算结果。
+
+
+统计代码各部分耗时
+with torch.autograd.profiler.profile(enabled=True, use_cuda=False) as profile:   
+     ...print(profile)# 2
+或者在命令行运行python -m torch.utils.bottleneck main.py
+
+
+使用TorchSnooper来调试PyTorch代码，程序在执行的时候，就会自动 print 出来每一行的执行结果的 tensor 的形状、数据类型、设备、是否需要梯度的信息。
+# pip install torchsnooperimport torchsnooper# 
+对于函数，使用修饰器@torchsnooper.snoop()# 
+如果不是函数，使用 with 语句来激活 TorchSnooper，把训练的那个循环装进 with 语句中去。
+with torchsnooper.snoop():    
+    原本的代码
+https://github.com/zasdfgbnm/TorchSnoopergithub.com
+
+
+模型可解释性，使用captum库：https://captum.ai/captum.ai
+
+
+参考资料：
+张皓：PyTorch Cookbook（常用代码段整理合集），https://zhuanlan.zhihu.com/p/59205847?
+PyTorch官方文档和示例
+https://pytorch.org/docs/stable/notes/faq.html 
+https://github.com/szagoruyko/pytorchviz
+https://github.com/sksq96/pytorch-summary 
