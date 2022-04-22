@@ -57,6 +57,13 @@ class MyLoss(nn.Module):
 import torch
 import torch.nn as nn
 
+
+# timm 库中有现成的接口
+# PyTorchImageModels
+# from timm.loss import LabelSmoothingCrossEntrophy
+# from timm.loss import SoftTargetCrossEntrophy
+# criterion = LabelSmoothingCrossEntrophy(smoothing=config.MODEL.LABEL_SMOOTHING)
+# criterion = SoftTargetCrossEntrophy()
 class LSR(nn.Module):
     def __init__(self,e=0.1,reduction='mean'):
         super(LSR,self).__init__()
@@ -87,6 +94,7 @@ class LSR(nn.Module):
         one_hot.scatter_add_(1,labels,value_added) 
         # scatter_add_(dim, index_tensor, other_tensor) 
         # 将other_tensor中的数据，按照index_tensor中的索引位置，添加至one_hot中
+        return one_hot
 
     def _smooth_label(self,target,length,smooth_factor):
         '''
@@ -143,9 +151,22 @@ for images, labels in train_loader:
 #******************************Mixup训练,数据增强的一种方式***********************************#
 # mixup采用对不同类别之间进行建模的方式实现数据增强，而通用数据增强方法则是针对同一类做变换。(经验风险最小->邻域风险最小),提升对抗样本及噪声样本的鲁棒性
 # 思路非常简单：
-# 从训练样本中随机抽取两个样本进行简单的随机加权求和，同时样本的标签也对应加权求和，然后预测结果与加权求和之后的标签求损失，在反向求导更新参数。
+# 从训练样本中随机抽取两个样本进行简单的随机加权求和，对于标签，相当于加权后的样本有两个label
+# 求loss的时候，对两个label的loss进行加权，在反向求导更新参数。
 # https://zhuanlan.zhihu.com/p/345224408
 # distributions包含可参数化的概率分布和采样函数
+# timm库有现成接口
+# from timm.data import Mixup
+# mixup_fn = Mixup(
+#               mixup_alpha=0.8, 
+#               cutmix_alpha=1.0, 
+#               cutmix_minmax=None,
+#               prob=1.0, 
+#               switch_prob=0.5,
+#               mode='batch',
+#               label_smoothing=0.1, 
+#               num_classes=1000)
+# x,y = mixup_fn(x,y)
 beta_distribution = torch.distributions.beta.Beta(alpha, alpha)
 for images, labels in train_loader:
     images, labels = images.cuda(), labels.cuda()
