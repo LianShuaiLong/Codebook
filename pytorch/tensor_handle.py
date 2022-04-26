@@ -137,3 +137,34 @@ result = tensor1*tensor2
 #********************计算两组数据的欧式距离*******************#
 #利用broadcast机制
 dist = torch.sqrt(torch.sum((X1[:,None,:]-X2)**2,dim=2))
+
+#********************改变张量(维度)顺序****************************#
+# 利用rearrange
+'''
+    1.将图像分成patch,并将patch进行向量化,合并成num_patches*(patch_size*image_channels)的二维矩阵
+    2.将得到的二维矩阵还原成原来的图像
+'''
+from PIL import Image
+from einops import rearrange
+from torchvision import transforms
+
+image_path = './test.jpg'
+image_data = Image.open(image_path)
+trans = transforms.Compose([transforms.CenterCrop((304,304)),transforms.ToTensor()])
+img_tensor = trans(image_data)
+img_pil = transforms.functional.to_pil_image(img_tensor)
+img_pil.save('img_pil.jpg')
+# p1:patch_size_h p2:patch_size_w h: num_patches in 'Height' w:num_patches in 'Width'
+img_patches = rearrange(img_tensor,'c (h p1) (w p2)->(h w) (p1 p2 c)',p1=16,p2=16)
+
+img_decoded = rearrange(img_patches,'(h w) (p1 p2 c)->c (h p1) (w p2)',h=19,w=19,p1=16,p2=16)
+img_ded = transforms.functional.to_pil_image(img_decoded)
+img_ded.save('img_decoded.jpg')
+
+print('1:',img_patches.shape)
+img_pat = transforms.functional.to_pil_image(img_patches)
+# https://pytorch.org/vision/main/_modules/torchvision/transforms/functional.html#to_pil_image
+# 源码实现的时候也是先将tensor转成ndarray(若tensor或者ndarray是二维的,会进行unsqueeze操作(CHW)或者expand_dims操作(HWC)
+# 然后转成Image(Image.fromarray)
+print('2:',img_patches.shape)
+img_pat.save('img_patches.jpg')
