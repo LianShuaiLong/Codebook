@@ -7,7 +7,7 @@ class multi_random_sample(object):
     而且支持[{},{},{},(),()]这种形式的list
     '''
     def __init__(self,src:list,sample_list:list):
-        super(multi_sample,self).__init__()
+        super(multi_random_sample,self).__init__()
         self.src = src
         self.sample_list = sample_list
         sample_rate=[item/sum(sample_list) for item in sample_list]
