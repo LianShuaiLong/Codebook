@@ -3,3 +3,4 @@ tensorflow/tensorflow1.x/ple_model_video_v0003/
 *.json
 *.log
 test*
+*.pyc
