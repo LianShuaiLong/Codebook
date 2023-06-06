@@ -1,0 +1,40 @@
+train:
+  lr: 0.1
+  n_classes: 2
+  k: 8
+  fm_device: '/gpu:0'
+  cpu_device: '/cpu:0'
+  end_learning_rate: 0.0005
+  learning_rate: 0.01
+  warmup_step: 500
+  drop_out: 0.7
+  batch_norm: true
+  expert_num: 4
+  expert_width: [128,64]
+  tower_width: [256,128,64]
+  use_fm: true
+  use_deep: true
+  p: 5.0
+  p1: 2.0
+  decay_steps: 500
+  
+shuffle : False
+batch_size: 2000 #4096 
+epochs: 3
+#steps: 40000
+steps: 1300
+
+feature_setting: './feature_config.json'
+
+# fpath: '../train_data/data_add_feature_simply_newDeviceID' # newId
+fpath: '../train_data/data_add_feature_simply_newDeviceID_deviceID_feature'
+# fpath: '../train_data/data_add_feature_mysql'
+model_dir: '../video_cover_model/'
+serving_model: '../video_cover_serving_model'
+model_name: 'video_cover_ctr'
+
+# fpath: 'hdfs://AutoRouter/team/cmp/hive_db/cmp_tmp/lianshuailong/recommend_multi/video/feature_v0005'
+# model_dir: 'hdfs://AutoRouter/team/cmp/hive_db/cmp_tmp/lianshuailong/recommend_multi/video/video_multi_model_v0005_spark/multi_model_esmm'
+# serving_model: 'hdfs://AutoRouter/team/cmp/hive_db/cmp_tmp/lianshuailong/recommend_multi/video/video_multi_model_v0005_spark/serving_model_esmm'
+# model_name: 'ple_model_video_v0005'
+
